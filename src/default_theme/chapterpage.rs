@@ -1,4 +1,5 @@
 use leptos::{component, view, IntoView};
+use leptos::prelude::{ClassAttribute, ElementChild};
 // use rscx_mdx::mdx::{Mdx, MdxComponentProps};
 use crate::models::Chapter;
 use leptos_mdx::mdx::{Components, Mdx};

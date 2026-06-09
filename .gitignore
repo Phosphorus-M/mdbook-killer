@@ -1,5 +1,6 @@
 /target
 /Prueba
 /Prueba2
+./examples/*
 
 /node_modules

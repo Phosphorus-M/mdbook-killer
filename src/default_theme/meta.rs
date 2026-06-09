@@ -1,8 +1,7 @@
-use std::{cell::RefCell, collections::HashMap, rc::Rc};
+use std::{collections::HashMap, sync::{Arc, Mutex}};
 
 use leptos::{
-    component, expect_context, ssr::render_to_string, view, Children, CollectView, Fragment,
-    IntoView,
+    IntoView, component, prelude::*, view
 };
 
 #[component]
@@ -12,32 +11,32 @@ pub fn Html(
 ) -> impl IntoView {
     let ctx = expect_context::<ShellCtx>();
     let mut class = Attrs::from(vec![("class", class.as_str())]);
-    ctx.body_attrs.borrow_mut().append(&mut class);
-    ctx.html_attrs.borrow_mut().append(&mut attrs);
+    ctx.body_attrs.lock().unwrap().append(&mut class);
+    ctx.html_attrs.lock().unwrap().append(&mut attrs);
 }
 
 #[component]
 pub fn Head(children: Children) -> impl IntoView {
     let ctx = expect_context::<ShellCtx>();
-    ctx.head_els.borrow_mut().push(children());
+    ctx.head_els.lock().unwrap().push(children().to_html());
 }
 
 #[component(transparent)]
 pub fn Dedup(#[prop(into)] key: String, children: Children) -> impl IntoView {
     let ctx = expect_context::<ShellCtx>();
-    let mut map = ctx.deduped_head_els.borrow_mut();
-    map.entry(key).or_insert_with(children);
+    let mut map = ctx.deduped_head_els.lock().unwrap();
+    map.entry(key).or_insert_with(|| children().to_html());
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 /// `ShellCtx` holds all the elements that will be rendered to the <head> of the page.
 /// It can be modified by any component by accessing the context, but it's suggested to be used in
 /// conjunction with the exported components <Dedup />, <Title />, <Html />, ....
 pub struct ShellCtx {
-    head_els: Rc<RefCell<Vec<Fragment>>>,
-    deduped_head_els: Rc<RefCell<HashMap<String, Fragment>>>,
-    html_attrs: Rc<RefCell<Attrs>>,
-    body_attrs: Rc<RefCell<Attrs>>,
+    head_els: Arc<Mutex<Vec<String>>>,
+    deduped_head_els: Arc<Mutex<HashMap<String, String>>>,
+    html_attrs: Arc<Mutex<Attrs>>,
+    body_attrs: Arc<Mutex<Attrs>>,
 }
 
 impl ShellCtx {
@@ -48,20 +47,37 @@ impl ShellCtx {
 
     #[must_use]
     pub fn render(self, inner_body: String) -> String {
-        let head = render_to_string(move || {
-            view! {
-                {self.head_els.borrow().clone().collect_view()}
-                {self.deduped_head_els.borrow().values().collect_view()}
+        let head = {
+            let head_els = self.head_els.lock().unwrap().clone();
+            let deduped_head_els = self.deduped_head_els.lock().unwrap().clone();
+            let mut head = String::new();
+            for item in head_els {
+                head.push_str(&item);
             }
-        });
+            for item in deduped_head_els.values() {
+                head.push_str(item);
+            }
+            head
+        };
 
         format!(
             "<!DOCTYPE html><html {}><head>{}</head><body {}>{}</body></html>",
-            self.html_attrs.borrow().render(),
+            self.html_attrs.lock().unwrap().render(),
             head,
-            self.body_attrs.borrow().render(),
+            self.body_attrs.lock().unwrap().render(),
             inner_body.trim(),
         )
+    }
+}
+
+impl Default for ShellCtx {
+    fn default() -> Self {
+        Self {
+            head_els: Arc::new(Mutex::new(Vec::new())),
+            deduped_head_els: Arc::new(Mutex::new(HashMap::new())),
+            html_attrs: Arc::new(Mutex::new(Attrs::default())),
+            body_attrs: Arc::new(Mutex::new(Attrs::default())),
+        }
     }
 }
 

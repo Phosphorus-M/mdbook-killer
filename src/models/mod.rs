@@ -30,7 +30,7 @@ pub struct Config {
     /// Information about the build environment.
     pub build: Option<BuildConfig>,
     /// Information about Rust language support.
-    pub rust: RustConfig,
+    pub rust: Option<RustConfig>,
     /// Information about localizations of this book.
     pub language: Option<LanguageConfig>,
     pub output: Option<PreprocessorsConfig>,

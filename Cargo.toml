@@ -6,37 +6,35 @@ edition = "2021"
 [dependencies]
 # leptos = "0.6.5"
 # cargo-leptos = "0.2.7"
-anyhow = "1.0.79"
-git2 = "0.18.2"
-inquire = "0.7"
-log = "0.4.21"
-env_logger = "0.11.3"
-clap-verbosity-flag = "2.2.0"
-serde = { version = "1.0.196", features = ["derive", "serde_derive"] }
-toml = "0.8.10"
-clap = { version = "4.1.6", features = [
+anyhow = "1.0.102"
+git2 = "0.21.0"
+inquire = "0.9"
+log = "0.4.30"
+env_logger = "0.11.10"
+clap-verbosity-flag = "3.0.4"
+serde = { version = "1.0.228", features = ["derive", "serde_derive"] }
+toml = "1.1.2"
+clap = { version = "4.6.1", features = [
     "derive",
     "color",
     "suggestions",
     "wrap_help",
 ] }
-clap_complete = "4.5.1"
-gray_matter = "0.2.7"
-tokio = { version = "1.37.0", features = ["full"] }
-leptos = { version = "0.6.11", features = ["experimental-islands"] }
-leptos_actix = { version = "0.6.9", optional = true, features = [
-  "experimental-islands",
-] }
-futures = "0.3.30"
-lol_html = "1.2.1"
-chrono = { version = "0.4.38", features = ["serde", "unstable-locales"] }
-once_cell = "1.19.0"
+clap_complete = "4.6.5"
+gray_matter = "0.3.2"
+tokio = { version = "1.52.3", features = ["full"] }
+leptos = { version = "0.8.19", features = ["islands", "ssr"] }
+leptos_actix = { version = "0.8.7", optional = true }
+futures = "0.3.32"
+lol_html = "2.9.0"
+chrono = { version = "0.4.44", features = ["serde", "unstable-locales"] }
+once_cell = "1.21.4"
 tailwind-css = { version = "0.13.0", features = ["compile_time"] }
-markdown = "1.0.0-alpha.17"
+markdown = "1.0.0"
 rscx-mdx = "0.1.7"
 rscx = "0.1.14"
-pulldown-cmark = "0.11.0"
+pulldown-cmark = "0.13.4"
 
 
-leptos-mdx = { git = "https://github.com/RustLangES/leptos-mdx.git", branch = "leptos-0.6.11" }
-tera = "1.20.0"
+leptos-mdx = { git = "https://github.com/RustLangES/leptos-mdx.git", branch = "leptos-0.8.19" }
+tera = "1.20.1"

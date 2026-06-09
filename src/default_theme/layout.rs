@@ -1,6 +1,6 @@
 use chrono::Datelike;
 use futures::executor::block_on;
-use leptos::Children;
+use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
 use crate::commands::CONFIG;
@@ -45,25 +45,25 @@ pub fn Layout(
             <meta charset="utf-8"/>
             <title>{title.clone()}</title>
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
-            <meta property="og:title" content=title.clone()/>
+            <meta name="og:title" content=title.clone()/>
             <meta name="description" content=description.clone()/>
-            <meta property="og:description" content=description.clone()/>
+            <meta name="og:description" content=description.clone()/>
             <meta
-                property="og:site_name"
+                name="og:site_name"
                 content=format!("Blog de Rust Lang en Español {}", get_year())
             />
-            <meta property="og:url" content="https://rustlang-es.org"/>
+            <meta name="og:url" content="https://rustlang-es.org"/>
 
             {if is_home {
                 view! {
                     <>
-                        <link rel="canonical" href="https://blog.rustlang-es.org"/>
+                        <link rel="canonical" href="https://blog.rustlang-es.org".to_string()/>
                         <meta
-                            property="og:image"
+                            name="og:image"
                             content=format!("https://rustlang-es.org/{slug}")
                         />
                         <meta
-                            property="twitter:image"
+                            name="twitter:image"
                             content=format!("https://rustlang-es.org/{slug}")
                         />
                     </>
@@ -71,13 +71,16 @@ pub fn Layout(
             } else {
                 view! {
                     <>
-                        <link rel="canonical" href=format!("https://rustlang-es.org/{slug}")/>
+                        <link 
+                            rel="canonical" 
+                            href=format!("https://rustlang-es.org/{slug}")
+                        />
                         <meta
-                            property="og:image"
+                            name="og:image"
                             content=format!("https://rustlang-es.org/{slug}.png")
                         />
                         <meta
-                            property="twitter:image"
+                            name="twitter:image"
                             content=format!("https://rustlang-es.org/{slug}.png")
                         />
                     </>

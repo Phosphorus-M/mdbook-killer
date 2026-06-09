@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use leptos::{component, document, html::{Div, ToHtmlElement}, view, Fragment, HtmlElement, IntoView, View};
+use leptos::prelude::*;
+use leptos::{component, view, IntoView};
 
 #[component]
 pub fn CustomComponent(

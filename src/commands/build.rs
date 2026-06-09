@@ -5,10 +5,6 @@ use crate::models::lang_config::LanguageConfig;
 use crate::models::Chapter;
 use crate::renderer::ssg::Ssg;
 use anyhow::{anyhow, Context, Result};
-use leptos::html::AnyElement;
-use leptos::leptos_dom::{ComponentRepr, Element};
-use leptos::ssr::render_to_string;
-use leptos::{component, document, view, Children, HtmlElement, IntoView};
 use std::collections::HashMap;
 use std::fs::{self, read_to_string, ReadDir};
 use std::path::Path;
@@ -130,12 +126,17 @@ fn charpters_from_folder(chapter_folder: ReadDir) -> Result<Vec<Chapter>> {
             .with_context(|| "Could not convert path to str")?;
         if algo.starts_with("---") {
             let matter = Matter::<YAML>::new();
-            let result = matter.parse_with_struct::<Chapter>(&algo);
-            let Some(parsed_entity) = result else {
+            let parsed_entity = match matter.parse::<Chapter>(&algo) {
+                Ok(parsed_entity) => parsed_entity,
+                Err(error) => {
+                    println!("Error parsing file {file:?}: {error}");
+                    continue;
+                }
+            };
+            let Some(mut chapter) = parsed_entity.data else {
                 println!("Error parsing file: {file:?}");
                 continue;
             };
-            let mut chapter: Chapter = parsed_entity.data;
             chapter.content = Some(parsed_entity.content);
 
             chapter.slug.get_or_insert(file.to_string());

@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use std::path::Path;
 use tokio::fs;
 
-use leptos::{provide_context, IntoView};
+use leptos::prelude::*;
 
 use crate::renderer::render::render;
 
@@ -29,7 +29,7 @@ impl<'a> Ssg<'a> {
         let ssg_ctx = SsgContext { path: path.clone() };
 
         // Render the view to a string
-        let res = render(move || view().into_view(), move || provide_context(ssg_ctx)).await;
+        let res = render(move || view(), move || provide_context(ssg_ctx)).await;
 
         // Write the string to a file
         let out_file = self.out_dir.join(path);
