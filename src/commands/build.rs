@@ -7,7 +7,7 @@ use crate::renderer::ssg::Ssg;
 use anyhow::{anyhow, Context, Result};
 use std::collections::HashMap;
 use std::fs::{self, read_to_string, ReadDir};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use gray_matter::engine::YAML;
 use gray_matter::Matter;
@@ -116,12 +116,20 @@ async fn generate_homepage<'a>(
 fn charpters_from_folder(chapter_folder: ReadDir) -> Result<Vec<Chapter>> {
     let mut chapters = Vec::with_capacity(10);
 
+    println!("Reading chapters from folder...");
     for path in chapter_folder {
         let file = path?.path();
+        println!("Reading file: {file:?}");
+        if file.is_dir() {
+            println!("Reading directory: {file:?}");
+            if !chapter_folder_detection(file.clone()) {
+                continue;
+            }
+        }
         let algo = fs::read_to_string(file.clone())?;
         let file = file
             .file_stem()
-            .unwrap()
+            .expect("Could not get file stem")
             .to_str()
             .with_context(|| "Could not convert path to str")?;
         if algo.starts_with("---") {
@@ -159,4 +167,43 @@ fn charpters_from_folder(chapter_folder: ReadDir) -> Result<Vec<Chapter>> {
     }
 
     Ok(chapters)
+}
+
+
+/// this method check if the path is a folder, if it is and the folder does not contain markdown files, it will
+///  copy all the content of the folder to the output, to be used for assets like images, css, js, etc.
+fn chapter_folder_detection(path: PathBuf) -> bool {
+    let mut has_md_files = false;
+    for entry in fs::read_dir(&path).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+        if path.extension().and_then(|s| s.to_str()) == Some("md") {
+            has_md_files = true;
+            break;
+        }
+    }
+    if !has_md_files {
+        // copy the folder to the output
+        let out_path = Path::new("./out/book").join(path.file_name().unwrap());
+        fs::create_dir_all(&out_path).unwrap();
+        for entry in fs::read_dir(&path).unwrap() {
+            let entry = entry.unwrap();
+            let path = entry.path();
+            if path.is_dir() {
+                fs::create_dir_all(out_path.join(path.file_name().unwrap())).unwrap();
+                for entry in fs::read_dir(&path).unwrap() {
+                    let entry = entry.unwrap();
+                    let path = entry.path();
+                    if path.is_file() {
+                        let file_name = path.file_name().unwrap();
+                        fs::copy(&path, out_path.join(file_name)).unwrap();
+                    }
+                }
+                continue;
+            }
+            let file_name = path.file_name().unwrap();
+            fs::copy(&path, out_path.join(file_name)).unwrap();
+        }
+    }
+    return has_md_files;
 }
