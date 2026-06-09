@@ -37,7 +37,7 @@ impl<'a> Ssg<'a> {
             println!("y si, fallo, que esperabas?, {}", error);
             Err(error)?;
         };
-        println!("wrote {}", out_file.display());
+        println!("wrote");
 
         Ok(())
     }

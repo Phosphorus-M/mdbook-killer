@@ -39,7 +39,7 @@ pub async fn execute(
         println!("Reading in {:?}", chapter_folder);
         println!("--------");
         chapters.append(&mut charpters_from_folder(chapter_folder)?);
-        println!("{:?}", chapters);
+        // println!("{:?}", chapters);
         println!("--------");
         println!("GENERACIÓN");
         println!("--------");
@@ -125,6 +125,9 @@ fn charpters_from_folder(chapter_folder: ReadDir) -> Result<Vec<Chapter>> {
             if !chapter_folder_detection(file.clone()) {
                 continue;
             }
+            let sub_folder = fs::read_dir(&file)?;
+            chapters.append(&mut charpters_from_folder(sub_folder)?);
+            continue;
         }
         let algo = fs::read_to_string(file.clone())?;
         let file = file

@@ -72,7 +72,7 @@ pub fn ChaptersNavigator(
             {
                 chapters.into_iter().map(|chapter| {
                     let link = if !language.is_empty() {
-                        format!("/{}.html", chapter.slug.unwrap())
+                        format!("/{language}/{}.html", chapter.slug.unwrap())
                     }else {
                         format!("{}/{}.html", language.clone(), chapter.slug.unwrap())
                     };

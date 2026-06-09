@@ -27,8 +27,8 @@ pub fn Layout(
     let config = block_on(fetch_config());
     let title = config.book.title.unwrap();
     let title_clone = title.clone();
-    let description = config.book.description.unwrap();
-    let description_clone = title.clone();
+    let description = config.book.description.unwrap_or_default();
+    let description_clone = description.clone();
 
     let language = if language.is_empty() {
         "en".to_string()
@@ -122,7 +122,7 @@ pub fn Layout(
         <section class="w-full flex flex-col">
 
             // <Async view=navigation_bar />
-            {if wide {
+            {if !wide {
                 view!{
                     <main class="container mx-auto">{children()}</main>
                 }
